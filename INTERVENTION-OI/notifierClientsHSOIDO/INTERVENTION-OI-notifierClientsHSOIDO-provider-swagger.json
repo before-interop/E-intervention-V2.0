@@ -1,0 +1,260 @@
+{
+	"openapi": "3.0.2",
+	"servers": [
+		{
+			"url": "https://partner.api.bouyguestelecom.fr/v1",
+			"description": "Racine d'url des API PARTENAIRE en PRODUCTION"
+		}
+	],
+	"paths": {
+		"/interventions-oi/notification-clients-hs-oi-do": {
+			"post": {
+				"tags": [
+					"notifierClientsHSOIDO"
+				],
+				"summary": "permet de mettre à jour le document dont l'id est fourni.",
+				"operationId": "notifierClientsHSOIDO",
+				"x-secured-access": "strict",
+				"security": [
+					{
+						"notifierClientsHSOIDO_auth": [
+							"EXT_InterventionOiManage"
+						]
+					}
+				],
+				"parameters": [
+				],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NotifierClientHsOIDO"
+							}
+						}
+					},
+					"description": "",
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ReponseClientsHsOIDOParInter"
+								}
+							}
+						},
+						"description": "Operation Successful"
+					}
+				},
+				"x-security-in": "IDENTITE_ET_GESTION",
+				"x-security-out": "IDENTITE_ET_GESTION"
+			}
+		}
+	},
+	"components": {
+		"securitySchemes": {
+			"notifierClientsHSOIDO_auth": {
+				"type": "oauth2",
+				"x-habilitations": [
+				],
+				"flows": {
+					"implicit": {
+						"authorizationUrl": "https://oauth2.bouyguestelecom.fr/authorize",
+						"scopes": {
+							"EXT_InterventionOiManage": ""
+						}
+					}
+				}
+			}
+		},
+		"schemas": {
+			"ClientHSOC": {
+				"description": "Conditionnel : au moins 1 client KO Liste des routes optiques de chaque client HS au PM dont l'heure de coupure est comprise dans l'intervalle",
+				"type": "object",
+				"required": [
+					"hmsCoupure",
+					"market",
+					"positionModulePM",
+					"refPTO",
+					"reparationCodeOC"
+				],
+				"properties": {
+					"fibre": {
+						"description": "",
+						"maxLength": 50,
+						"type": "string"
+					},
+					"hmsCoupure": {
+						"description": "Date/heure de début de coupure pour le client (format selon la norme ISO 8601)",
+						"type": "string",
+						"format": "date-time"
+					},
+					"market": {
+						"description": "",
+						"type": "string"
+					},
+					"nomModulePM": {
+						"description": "",
+						"type": "string"
+					},
+					"numeroSerie": {
+						"description": "",
+						"type": "string"
+					},
+					"positionModulePM": {
+						"description": "",
+						"maxLength": 100,
+						"type": "string"
+					},
+					"refPBO": {
+						"description": "",
+						"maxLength": 100,
+						"type": "string"
+					},
+					"refPTO": {
+						"description": "",
+						"maxLength": 50,
+						"type": "string"
+					},
+					"referencePrestationPrise": {
+						"description": "",
+						"type": "string"
+					},
+					"reparationCodeOC": {
+						"description": "",
+						"type": "string"
+					},
+					"reparationOCDemande": {
+						"description": "",
+						"type": "boolean"
+					},
+					"statutLigne": {
+						"description": "",
+						"type": "string",
+						"enum": [
+							"COUPURE",
+							"INCONNU"
+						]
+					},
+					"tube": {
+						"description": "",
+						"maxLength": 50,
+						"type": "string"
+					}
+				}
+			},
+			"ClientHsOcParInter": {
+				"description": "",
+				"type": "object",
+				"required": [
+					"codeOCImpacte",
+					"message",
+					"multiIntervention"
+				],
+				"properties": {
+					"clientHSOC": {
+						"description": "",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ClientHSOC"
+						}
+					},
+					"codeOCImpacte": {
+						"description": "Code opérateur Interop de celui ayant des clients impactés",
+						"maxLength": 4,
+						"type": "string"
+					},
+					"increment": {
+						"description": "",
+						"type": "string"
+					},
+					"message": {
+						"description": "",
+						"type": "string"
+					},
+					"multiIntervention": {
+						"description": "",
+						"type": "boolean"
+					},
+					"numeroTest": {
+						"description": "",
+						"type": "string"
+					}
+				}
+			},
+			"NotifierClientHsOIDO": {
+				"description": "",
+				"type": "object",
+				"required": [
+					"referenceIntervOI"
+				],
+				"properties": {
+					"clientHsOcParInter": {
+						"description": "",
+						"type": "array",
+						"items": {
+							"$ref": "#/components/schemas/ClientHsOcParInter"
+						}
+					},
+					"referenceIntervOI": {
+						"description": "Référence d�??intervention unique produite par l'OI",
+						"maxLength": 50,
+						"type": "string"
+					}
+				}
+			},
+			"ReponseClientsHsOIDOParInter": {
+				"description": "",
+				"type": "object",
+				"required": [
+					"code",
+					"libelle"
+				],
+				"properties": {
+					"code": {
+						"description": "0 si OK 1 si CHAMPS_NON_RENSEIGNE 2 si MAUVAIS_FORMAT 3 si REF_INTERV_OI_INCONNUE",
+						"type": "integer",
+						"format": "int32"
+					},
+					"description": {
+						"description": "Description de l'erreur",
+						"maxLength": 100,
+						"type": "string"
+					},
+					"libelle": {
+						"description": "",
+						"type": "string",
+						"enum": [
+							"CHAMPS_NON_RENSEIGNE",
+							"MAUVAIS_FORMAT",
+							"OK",
+							"REF_INTERV_OI_INCONNUE",
+							"sans nom1"
+						]
+					}
+				}
+			}
+		}
+	},
+	"info": {
+		"x-objetmetier": "INTERVENTION-OI",
+		"x-sf": "",
+		"x-st": "MSF",
+		"x-type": "partenaire",
+		"x-execution": "api",
+		"x-role": "provider",
+		"title": "INTERVENTION-OI-notifierClientsHSOIDO",
+		"version": "1.0.262",
+		"description": "",
+		"contact": {
+			"name": "MOE MSF"
+		}
+	},
+	"tags": [
+		{
+			"name": "notifierClientsHSOIDO",
+			"description": "permet de mettre à jour le document dont l'id est fourni."
+		}
+	]
+}
